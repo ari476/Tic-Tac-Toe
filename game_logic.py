@@ -1,5 +1,5 @@
 from enum import Enum
-
+import copy
 
 class Player(Enum):
     X = 'X'
@@ -7,9 +7,9 @@ class Player(Enum):
 
 
 class TicTacToe:
-    def __init__(self):
-        self.current_player = Player.X
-        self.board = [[None for _ in range(3)] for _ in range(3)]
+    def __init__(self, current_player = None, board = None):
+        self.current_player = current_player or Player.X
+        self.board = copy.deepcopy(board) or [[None for _ in range(3)] for _ in range(3)]
 
     def is_cell_empty(self, cell_pos):
         return self.board[cell_pos[0]][cell_pos[1]] is None

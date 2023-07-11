@@ -1,6 +1,6 @@
 from game_logic import Player
 from typing import List
-
+from game_logic import TicTacToe
 
 
 def make_decision(board: List[List[Player]], ai_player: Player) -> tuple:
