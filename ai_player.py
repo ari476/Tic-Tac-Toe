@@ -11,5 +11,6 @@ def make_decision(board: List[List[Player]], ai_player: Player) -> tuple:
 
     Returns:
         tuple: cell position for placing the next symbol on the game board
+        (x, y)
     """
     pass
