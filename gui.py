@@ -8,14 +8,14 @@ import random
 size_of_board = 600
 symbol_size = (size_of_board / 3 - size_of_board / 8) / 2
 symbol_thickness = 30
-symbol_X_color = '#EE4035'
+symbol_X_color = '#EE4035'              
 symbol_O_color = '#0492CF'
 Green_color = '#7BC043'
 
 
 class TicTacToeGUI(TicTacToe):
     def __init__(self):
-        self.window = Tk()
+        self.window = Tk()              # ההכנה הראשונה של לוח 
         self.window.title('Tic-Tac-Toe')
         self.canvas = Canvas(
             self.window, width=size_of_board, height=size_of_board)
@@ -30,9 +30,9 @@ class TicTacToeGUI(TicTacToe):
 
     def initialize_game(self):
         super().__init__()
-        self.reset_board = False
-        is_ai_start = random.choice([True, False])
-        self.make_ai_move() if is_ai_start else None
+        self.reset_board = False # לוח פעיל 
+        is_ai_start = random.choice([True, False]) # רנדום מי מתחיל 
+        self.make_ai_move() if is_ai_start else None # AI או בן אדם צריך לעשות תור 
 
         for i in range(2):
             self.canvas.create_line(

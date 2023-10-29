@@ -1,6 +1,7 @@
 from game_logic import Player
 from typing import List
 from game_logic import TicTacToe
+import random
 
 
 def make_decision(board: List[List[Player]], ai_player: Player) -> tuple:
@@ -12,4 +13,9 @@ def make_decision(board: List[List[Player]], ai_player: Player) -> tuple:
     Returns:
         tuple: cell position for placing the next symbol on the game board
     """
-    pass
+    x = random.randint(0, 2)
+    y = random.randint(0, 2)
+    while board[x][y] != None: 
+        x = random.randint(0, 2)
+        y = random.randint(0, 2)
+    return (x,y)
