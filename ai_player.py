@@ -10,7 +10,7 @@ MIDDLE = [(0, 1), (1, 2), (2, 1), (1, 0)]
 def is_board_empty(board: List[List[Player]]):
     for row in range(3):
         for column in range(3):
-            if not TicTacToe.is_cell_empty((row, column)):
+            if not is_empty((row, column), board):
                 return False
     return True
 
