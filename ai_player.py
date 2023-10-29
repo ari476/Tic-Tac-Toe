@@ -14,6 +14,9 @@ def is_board_empty(board: List[List[Player]]):
                 return False
     return True
 
+def is_empty(cell_pos: tuple, board: List[List[Player]]):
+    return board[cell_pos[0]][cell_pos[1]] is None
+
 def make_decision(board: List[List[Player]], ai_player: Player) -> tuple:
     """
     Args:
@@ -35,11 +38,11 @@ def make_decision(board: List[List[Player]], ai_player: Player) -> tuple:
         return corner
     
     elif TURN == 1:  #if computer is second
-        if TicTacToe.is_cell_empty((1,1)):
+        if is_empty((1,1), board):
             return (1,1)
         else:
             for corner in CORNERS:
-                if TicTacToe.is_cell_empty(corner):
+                if is_empty(corner, board):
                     TURN = 4
                     return corner
                 
@@ -47,72 +50,122 @@ def make_decision(board: List[List[Player]], ai_player: Player) -> tuple:
         for row in range(3):  #checks for two in a row (in row)
             if board[row][0] == board[row][1]:
                 TURN = TURN + 2
-                return (row, 2)
+                if is_empty((row, 2), board):
+                    return (row, 2)
             
             elif board[row][1] == board[row][2]:
                 TURN = TURN + 2
-                return (row, 0)
+                if is_empty((row, 0), board):
+                    return (row, 0)
             
             elif board[row][2] == board[row][0]: #checks for two in corners of row
                 TURN = TURN + 2
-                return (row, 1)
+                if is_empty((row, 1), board):
+                    return (row, 1)
 
 
         for column in range(3): #checks for two in a row (in column)
             if column == 0:
                 if board[0][column] == board[0][column + 1]:
                     TURN = TURN + 2
-                    return (0, column + 2)
+                    if is_empty((0, column + 2), board):
+                        return (0, column + 2)
                 
             elif column == 1:
                 if board[0][column] == board[0][column + 1]:
                     TURN = TURN + 2
-                    return (0, column - 1)
+                    if is_empty((0, column - 1), board):
+                        return (0, column - 1)
                 
             else:
                 if board[0][column] == board[0][column - 2]: #checks for two in corners of column
                     TURN = TURN + 2
-                    return (0, column - 1)
+                    if is_empty((0, column - 1), board):
+                        return (0, column - 1)
                 
         for row in range(3):  #checks for two in a row (in diagonal) 
             if row == 0:
                 if board[row][0] == board[row + 1][1]:
                     TURN = TURN + 2
-                    return (row + 2, 2)
+                    if is_empty((row + 2, 2), board):
+                        return (row + 2, 2)
 
                 elif board[row][2] == board[row + 1][1]:
                     TURN = TURN + 2
-                    return (row + 2, 0)
+                    if is_empty((row + 2, 0), board):
+                        return (row + 2, 0)
 
 
             elif row == 1:
                 if board[row][1] == board[row + 1][2]:
                     TURN = TURN + 2
-                    return (row - 1, 0)
+                    if is_empty((row - 1, 0), board):
+                        return (row - 1, 0)
 
                 elif board[row][1] == board[row + 1][0]:
                     TURN = TURN + 2
-                    return (row - 1, 2)
+                    if is_empty((row - 1, 2), board):
+                        return (row - 1, 2)
 
             else: #checks for two in corners of diagonal
                 if board[row][2] == board[row - 2][0]:
                     TURN = TURN + 2
-                    return (row - 1, 1)
+                    if is_empty((row - 1, 1), board):
+                        return (row - 1, 1)
 
                 elif board[row][0] == board[row - 2][2]:
                     TURN = TURN + 2
-                    return (row - 1, 1)
+                    if is_empty((row - 1, 1), board):
+                        return (row - 1, 1)
                 
     else:
+        for corner in CORNERS: #checks for cell next to my cell
+            row = corner[0]
+            column = corner[1]
+            if column == 0:
+                if board[row, column + 1] == board[row, column]:
+                    if is_empty(corner, board):
+                        TURN = TURN + 2
+                        return corner
+            elif column == 2:
+                if board[row, column - 1] == board[row, column]:
+                    if is_empty(corner, board):
+                        TURN = TURN + 2
+                        return corner
+            
+            if row == 0:
+                if board[row + 1, column] == board[row, column]:
+                    if is_empty(corner, board):
+                        TURN = TURN + 2
+                        return corner
+            elif row == 2:
+                if board[row - 1, column] == board[row, column]:
+                    if is_empty(corner, board):
+                        TURN = TURN + 2
+                        return corner
+            
         for corner in CORNERS:
-            #add if cell next to it is my cell
-            if TicTacToe.is_cell_empty(corner):
+            if is_empty(corner, board):
                 TURN = TURN + 2
                 return corner
             
+        for middle in MIDDLE: #checks for cell next to my cell
+            row = middle[0]
+            column = middle[1]
+            if row == 0 or row == 2:
+                if board[row, column + 1] == board[row, column] or board[row, column - 1] == board[row, column]:
+                    if is_empty(middle, board):
+                        TURN = TURN + 2
+                        return middle
+                    
+            elif row == 1:
+                if board[1, 1] == board[row, column] or board[row + 1, column] == board[row, column] or board[row -1, column] == board[row, column]:
+                    if is_empty(middle, board):
+                        TURN = TURN + 2
+                        return middle
+
         for middle in MIDDLE:
-            #add if cell next to it is my cell
-            if TicTacToe.is_cell_empty(middle):
+            if is_empty(middle, board):
                 TURN = TURN + 2
                 return middle
             
