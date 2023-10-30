@@ -45,8 +45,11 @@ def evaluate(board, player, opponent):
 def minimax(board, depth, isMax, player, alpha, beta):
     opponent = Player.X if player == Player.O else Player.O
     score = evaluate(board, player, opponent)
-    if score == 10 or score == -10:
-        return score
+
+    if score == 10:
+        return score - depth
+    if score == -10:
+        return score + depth
 
     if isMovesLeft(board) == False:
         return 0
