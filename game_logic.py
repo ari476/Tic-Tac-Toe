@@ -5,14 +5,13 @@ class Player(Enum):
     X = 'X'
     O = 'O'
 
-
 class TicTacToe:
-    def __init__(self, current_player = None, board = None): # מכין לוח ושחקן  
-        self.current_player = current_player or Player.X # מי מתחיל 
-        self.board = copy.deepcopy(board) or [[None for _ in range(3)] for _ in range(3)] #מעתיק את הלוח שלא יגעו
+    def __init__(self, current_player = None, board = None):     
+        self.current_player = current_player or Player.X 
+        self.board = copy.deepcopy(board) or [[None for _ in range(3)] for _ in range(3)] 
 
     def is_cell_empty(self, cell_pos):
-        return self.board[cell_pos[0]][cell_pos[1]] is None # מזהה תאים ריקים 
+        return self.board[cell_pos[0]][cell_pos[1]] is None    
 
     def is_winners(self):
         """
@@ -36,7 +35,7 @@ class TicTacToe:
 
         return False
 
-    def is_cells_occupied(self):  # בודק אם כול התאים תפוסים 
+    def is_cells_occupied(self):  
         return all(self.board[row][col] is not None for row in range(3) for col in range(3))
 
     def is_game_over(self):
