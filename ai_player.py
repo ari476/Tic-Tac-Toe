@@ -12,7 +12,7 @@ def isMovesLeft(board):
         return False
     return True
 
-
+# checks for wins and will grade them.
 def evaluate(board, player, opponent):
     for row in range(3):
         if board[row][0] == board[row][1] and board[row][1] == board[row][2]:
@@ -41,20 +41,21 @@ def evaluate(board, player, opponent):
             return -10
     return 0
 
-
+# minimax function with alpha beta pruning.
 def minimax(board, depth, isMax, player, alpha, beta):
     opponent = Player.X if player == Player.O else Player.O
     score = evaluate(board, player, opponent)
 
     if score == 10:
-        return score - depth
+        return score - depth # - depth to give preference to faster wins
     if score == -10:
-        return score + depth
+        return score + depth # + depth to prolong loosing.
 
     if isMovesLeft(board) == False:
         return 0
 
-    if isMax:
+    # ai turn
+    if isMax: 
         best = -1000
         for i in range(3):
             for j in range(3):
@@ -70,7 +71,8 @@ def minimax(board, depth, isMax, player, alpha, beta):
                     if beta <= alpha:
                         break
         return best
-    else:
+    # player turn
+    else: 
         best = 1000
         for i in range(3):
             for j in range(3):
@@ -91,7 +93,6 @@ def findBestMove(board, ai_player):
     bestVal = -1000
     alpha = float("-inf")
     beta = float("inf")
-    bestMove = (-1, -1)
     for i in range(3):
         for j in range(3):
             if board[i][j] == None:
