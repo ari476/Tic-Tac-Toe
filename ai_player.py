@@ -3,27 +3,125 @@ from typing import List
 from game_logic import TicTacToe
 import random
 
-CORNERS = [(0, 0), (0, 2), (2, 0), (2, 2)]
-MIDDLE = [(0, 1), (1, 2), (2, 1), (1, 0)]
+# This function returns true if there are moves  
+# remaining on the board. It returns false if  
+# there are no moves left to play.  
+def is_moves_left(board) :  
 
-def is_board_empty(board: List[List[Player]]):
-    for row in range(3):
-        for column in range(3):
-            if not is_empty((row, column), board):
-                return False
-    return True
+    for row in range(3) : 
+        for col in range(3) : 
+            if (board[row][col] == None) : 
+                return True 
+    return False
 
-def is_empty(cell_pos: tuple, board: List[List[Player]]):
-    return board[cell_pos[0]][cell_pos[1]] is None
+# This is the evaluation function as discussed  
+# in the previous article ( http://goo.gl/sJgv68 )  
+def evaluate(board) :  
+    
+    # Checking for Rows for X or O victory.  
+    for row in range(3) :      
+        if (board[row][0] == board[row][1] and board[row][1] == board[row][2]) :         
+            if (board[row][0] == player) : 
+                return 10
+            elif (board[row][0] == opponent) : 
+                return -10
 
-def cell_not_empty(board: List[List[Player]]):
-    counter = 0
-    for row in range(3):
-        for column in range(3):
-            if not is_empty((row, column), board):
-                counter += 1
+    # Checking for Columns for X or O victory.  
+    for col in range(3) : 
+    
+        if (board[0][col] == board[1][col] and board[1][col] == board[2][col]) : 
+        
+            if (board[0][col] == player) :  
+                return 10
+            elif (board[0][col] == opponent) : 
+                return -10
 
+    # Checking for Diagonals for X or O victory.  
+    if (board[0][0] == board[1][1] and board[1][1] == board[2][2]) : 
+    
+        if (board[0][0] == player) : 
+            return 10
+        elif (board[0][0] == opponent) : 
+            return -10
 
+    if (board[0][2] == board[1][1] and board[1][1] == board[2][0]) : 
+    
+        if (board[0][2] == player) : 
+            return 10
+        elif (board[0][2] == opponent) : 
+            return -10
+
+    # Else if none of them have won then return 0  
+    return 0
+
+# This is the minimax function. It considers all  
+# the possible ways the game can go and returns  
+# the value of the board  
+def minimax(board, depth, isMax) :  
+    score = evaluate(board) 
+
+    # If Maximizer has won the game return his/her  
+    # evaluated score  
+    if (score == 10) :  
+        return score 
+
+    # If Minimizer has won the game return his/her  
+    # evaluated score  
+    if (score == -10) : 
+        return score 
+
+    # If there are no more moves and no winner then  
+    # it is a tie  
+    if (is_moves_left(board) == False) : 
+        return 0
+
+    # If this maximizer's move  
+    if (isMax) :      
+        best = -1000 
+
+        # Traverse all cells  
+        for i in range(3) :          
+            for j in range(3) : 
+            
+                # Check if cell is empty  
+                if (board[i][j]=='_') : 
+                
+                    # Make the move  
+                    board[i][j] = player  
+
+                    # Call minimax recursively and choose  
+                    # the maximum value  
+                    best = max( best, minimax(board, 
+                                            depth + 1, 
+                                            not isMax) ) 
+
+                    # Undo the move  
+                    board[i][j] = '_'
+        return best 
+
+    # If this minimizer's move  
+    else : 
+        best = 1000 
+
+        # Traverse all cells  
+        for i in range(3) :          
+            for j in range(3) : 
+            
+                # Check if cell is empty  
+                if (board[i][j] == '_') : 
+                
+                    # Make the move  
+                    board[i][j] = opponent  
+
+                    # Call minimax recursively and choose  
+                    # the minimum value  
+                    best = min(best, minimax(board, depth + 1, not isMax)) 
+
+                    # Undo the move  
+                    board[i][j] = '_'
+        return best 
+
+# This will return the best possible move for the player  
 def make_decision(board: List[List[Player]], ai_player: Player) -> tuple:
     """
     Args:
@@ -33,190 +131,39 @@ def make_decision(board: List[List[Player]], ai_player: Player) -> tuple:
     Returns:
         tuple: cell position for placing the next symbol on the game board
         (y, x)
-    """
-
-    global CORNERS
-    global MIDDLE
-    
+    """  
     if ai_player == Player.X:
-        enemy = Player.O
+        player = Player.X
+        opponent = Player.O
     else:
-        enemy = Player.X
-    
-    if ai_player == Player.X:  #checks if computer is first
-        corner = CORNERS[random.randrange(0,4)]
-        return corner
-    
-    else:  #if computer is second
-        if is_empty((1,1), board):
-            return (1,1)
-        else:
-            for corner in CORNERS:
-                if is_empty(corner, board):
-                    return corner
-                
-    if ai_player == Player.O:  #not first or second turn 
-        for row in range(3):  #checks for two in a row (in row)
-            if board[row][0] == board[row][1] and (board[row][0] == enemy and board[row][1] == enemy):
-                if is_empty((row, 2), board):
-                    return (row, 2)
-            
-            elif board[row][1] == board[row][2] and (board[row][1] == enemy and board[row][2] == enemy):
-                if is_empty((row, 0), board):
-                    return (row, 0)
+        opponent = Player.X
+        player = Player.O
+    bestVal = -1000 
+    bestMove = (-1, -1)  
 
-            elif board[row][2] == board[row][0] and (board[row][2] == enemy and board[row][0] == enemy): #checks for two in corners of row
-                if is_empty((row, 1), board):
-                    return (row, 1)
-
-
-        for column in range(3): #checks for two in a row (in column)
-            if column == 0:
-                if (board[0][column] == board[0][column + 1]) and (board[0][column] == enemy and board[0][column + 1] == enemy):
-                    if is_empty((0, column + 2), board):
-                        return (0, column + 2)
-                
-            elif column == 1:
-                if board[0][column] == board[0][column + 1] and (board[0][column] == enemy and board[0][column + 1] == enemy):
-                    if is_empty((0, column - 1), board):
-                        return (0, column - 1)
-                
-            else:
-                if board[0][column] == board[0][column - 2] and (board[0][column] == enemy and board[0][column - 2] == enemy): #checks for two in corners of column
-                    if is_empty((0, column - 1), board):
-                        return (0, column - 1)
-                
-        for row in range(3):  #checks for two in a row (in diagonal) 
-            if row == 0:
-                if board[row][0] == board[row + 1][1] and (board[row][0] == enemy and board[row + 1][1] == enemy):
-                    if is_empty((row + 2, 2), board):
-                        return (row + 2, 2)
-
-                elif board[row][2] == board[row + 1][1] and (board[row][2] == enemy and board[row + 1][1] == enemy):
-                    if is_empty((row + 2, 0), board):
-                        return (row + 2, 0)
-
-
-            elif row == 1:
-                if board[row][1] == board[row + 1][2] and (board[row][1] == enemy and board[row + 1][2] == enemy):
-                    if is_empty((row - 1, 0), board):
-                        return (row - 1, 0)
-
-                elif board[row][1] == board[row + 1][0] and (board[row][1] == enemy and board[row + 1][0] == enemy):
-                    if is_empty((row - 1, 2), board):
-                        return (row - 1, 2)
-
-            else: #checks for two in corners of diagonal
-                if board[row][2] == board[row - 2][0] and (board[row][2] == enemy and board[row - 2][0] == enemy):
-                    if is_empty((row - 1, 1), board):
-                        return (row - 1, 1)
-
-                elif board[row][0] == board[row - 2][2] and (board[row][0] == enemy and board[row - 2][2] == enemy):
-                    if is_empty((row - 1, 1), board):
-                        return (row - 1, 1)
-                    
-            for row in range(3):  #checks for two in a row (in row)
-                if board[row][0] == board[row][1] and (board[row][0] == enemy and board[row][1] == enemy):
-                    if is_empty((row, 2), board):
-                        return (row, 2)
-                
-                elif board[row][1] == board[row][2] and (board[row][1] == enemy and board[row][2] == enemy):
-                    if is_empty((row, 0), board):
-                        return (row, 0)
-
-                elif board[row][2] == board[row][0] and (board[row][2] == enemy and board[row][0] == enemy): #checks for two in corners of row
-                    if is_empty((row, 1), board):
-                        return (row, 1)
-
-        #check for win
-        for column in range(3): #checks for two in a row (in column)
-            if column == 0:
-                if (board[0][column] == board[0][column + 1]) and (board[0][column] == ai_player and board[0][column + 1] == ai_player):
-                    if is_empty((0, column + 2), board):
-                        return (0, column + 2)
-                
-            elif column == 1:
-                if board[0][column] == board[0][column + 1] and (board[0][column] == ai_player and board[0][column + 1] == ai_player):
-                    if is_empty((0, column - 1), board):
-                        return (0, column - 1)
-                
-            else:
-                if board[0][column] == board[0][column - 2] and (board[0][column] == ai_player and board[0][column - 2] == ai_player): #checks for two in corners of column
-                    if is_empty((0, column - 1), board):
-                        return (0, column - 1)
-                
-        for row in range(3):  #checks for two in a row (in diagonal) 
-            if row == 0:
-                if board[row][0] == board[row + 1][1] and (board[row][0] == ai_player and board[row + 1][1] == ai_player):
-                    if is_empty((row + 2, 2), board):
-                        return (row + 2, 2)
-
-                elif board[row][2] == board[row + 1][1] and (board[row][2] == ai_player and board[row + 1][1] == ai_player):
-                    if is_empty((row + 2, 0), board):
-                        return (row + 2, 0)
-
-
-            elif row == 1:
-                if board[row][1] == board[row + 1][2] and (board[row][1] == ai_player and board[row + 1][2] == ai_player):
-                    if is_empty((row - 1, 0), board):
-                        return (row - 1, 0)
-
-                elif board[row][1] == board[row + 1][0] and (board[row][1] == ai_player and board[row + 1][0] == ai_player):
-                    if is_empty((row - 1, 2), board):
-                        return (row - 1, 2)
-
-            else: #checks for two in corners of diagonal
-                if board[row][2] == board[row - 2][0] and (board[row][2] == ai_player and board[row - 2][0] == ai_player):
-                    if is_empty((row - 1, 1), board):
-                        return (row - 1, 1)
-
-                elif board[row][0] == board[row - 2][2] and (board[row][0] == ai_player and board[row - 2][2] == ai_player):
-                    if is_empty((row - 1, 1), board):
-                        return (row - 1, 1)
-                
-    for corner in CORNERS: #checks for cell next to my cell
-        row = corner[0]
-        column = corner[1]
-        if column == 0:
-            if board[row][column + 1] == board[row][column] and (board[row][column + 1] == ai_player and board[row][column] == ai_player):
-                if is_empty(corner, board):
-                    return corner
-        elif column == 2:
-            if board[row][column - 1] == board[row][column] and (board[row][column - 1] == ai_player and board[row][column] == ai_player):
-                if is_empty(corner, board):
-                    return corner
+    # Traverse all cells, evaluate minimax function for  
+    # all empty cells. And return the cell with optimal  
+    # value.  
+    for row in range(3) :      
+        for col in range(3) : 
         
-        if row == 0:
-            if board[row + 1][column] == board[row][column] and (board[row + 1][column] == ai_player and board[row][column] == ai_player):
-                if is_empty(corner, board):
-                    return corner
-        elif row == 2:
-            if board[row - 1][column] == board[row][column] and (board[row - 1][column] == ai_player and board[row][column] == ai_player):
-                if is_empty(corner, board):
-                    return corner
-    else:    
-        for corner in CORNERS:
-            if is_empty(corner, board):
-                return corner
+            # Check if cell is empty  
+            if (board[row][col] == None) :  
             
-        for middle in MIDDLE: #checks for cell next to my cell
-            row = middle[0]
-            column = middle[1]
-            if row == 0 or row == 2:
-                if board[row][column + 1] == board[row][column] or board[row][column - 1] == board[row][column] and ((board[row][column + 1] == ai_player or board[row][column] == ai_player) and (board[row][column - 1] == ai_player and board[row][column] == ai_player)):
-                    if is_empty(middle, board):
-                        return middle
-                    
-            elif row == 1:
-                if board[1][1] == board[row][column] or board[row + 1][column] == board[row][column] or board[row -1][column] == board[row][column] and ((board[1][1] == ai_player or board[row][column] == ai_player) or (board[row + 1][column] == ai_player or board[row][column] == ai_player) or (board[row -1][column] == ai_player or board[row][column] == ai_player)):
-                    if is_empty(middle, board):
-                        return middle
+                # Make the move  
+                board[row][col] = player 
 
-        for middle in MIDDLE:
-            if is_empty(middle, board):
-                return middle
-            
-        for row in range(3):
-            for column in range(3):
-                if is_empty((row, column), board):
-                    return (row, column)
+                # compute evaluation function for this  
+                # move.  
+                moveVal = minimax(board, 0, False)  
+
+                # Undo the move  
+                board[row][col] = None
+
+                # If the value of the current move is  
+                # more than the best value, then update  
+                # best/  
+                if (moveVal > bestVal) :                 
+                    bestMove = (row, col) 
+                    bestVal = moveVal 
+    return bestMove 
