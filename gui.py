@@ -1,6 +1,6 @@
 from tkinter import messagebox, Tk, Canvas
-from game_logic import TicTacToe, Player
 from ai_player import make_decision
+from game_logic import TicTacToe, Player
 import numpy as np
 import copy
 import random
@@ -120,6 +120,7 @@ class TicTacToeGUI(TicTacToe):
 
                 self.current_player = Player.X if self.current_player is Player.O else Player.O
                 return True
+                
         # is play again
         else:
             self.canvas.delete('all')
