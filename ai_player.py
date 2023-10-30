@@ -63,7 +63,6 @@ def minimax(board, isMax, player):
                     board[i][j] = Player.O if player == Player.X else Player.X
                     best = min(best, minimax(board, not isMax, player))
                     board[i][j] = None
-        print(best)
         return best
 
 def make_decision(board: List[List[Player]], ai_player: Player) -> tuple:
