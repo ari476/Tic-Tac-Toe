@@ -1,6 +1,7 @@
 from typing import List
 from game_logic import Player
 
+
 def make_decision(board: List[List[Player]], ai_player: Player) -> tuple:
     bestMove = findBestMove(board, ai_player)
     return bestMove
@@ -10,6 +11,7 @@ def isMovesLeft(board):
     if all(board[row][col] is not None for row in range(3) for col in range(3)):
         return False
     return True
+
 
 def evaluate(board, player, opponent):
     for row in range(3):
@@ -40,7 +42,7 @@ def evaluate(board, player, opponent):
     return 0
 
 
-def minimax(board, depth, isMax, player):
+def minimax(board, depth, isMax, player, alpha, beta):
     opponent = Player.X if player == Player.O else Player.O
     score = evaluate(board, player, opponent)
     if score == 10 or score == -10:
@@ -55,8 +57,15 @@ def minimax(board, depth, isMax, player):
             for j in range(3):
                 if board[i][j] == None:
                     board[i][j] = player
-                    best = max(best, minimax(board, depth + 1, False, player))
+                    best = max(
+                        best, minimax(board, depth + 1, False, player, alpha, beta)
+                    )
+                    alpha = max(alpha, best)
                     board[i][j] = None
+
+                    # alpha beta pruning
+                    if beta <= alpha:
+                        break
         return best
     else:
         best = 1000
@@ -64,19 +73,27 @@ def minimax(board, depth, isMax, player):
             for j in range(3):
                 if board[i][j] == None:
                     board[i][j] = opponent
-                    best = min(best, minimax(board, depth + 1, True , player))
+                    best = min(
+                        best, minimax(board, depth + 1, True, player, alpha, beta)
+                    )
+                    beta = min(beta, best)
                     board[i][j] = None
+
+                    if beta <= alpha:
+                        break
         return best
 
 
 def findBestMove(board, ai_player):
     bestVal = -1000
+    alpha = float("-inf")
+    beta = float("inf")
     bestMove = (-1, -1)
     for i in range(3):
         for j in range(3):
             if board[i][j] == None:
                 board[i][j] = ai_player
-                moveVal = minimax(board, 0, False, ai_player)
+                moveVal = minimax(board, 0, False, ai_player, alpha, beta)
                 board[i][j] = None
                 if moveVal > bestVal:
                     bestMove = (i, j)
