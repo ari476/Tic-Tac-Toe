@@ -4,7 +4,7 @@ from game_logic import TicTacToe
 
 
 def make_decision(board: List[List[Player]], ai_player: Player) -> tuple:
-    bestMove = findBestMove(board, ai_player)
+    bestMove = findBestMove(board,ai_player)
     return bestMove
 
 
@@ -45,8 +45,10 @@ def evaluate(board, player, opponent):
 def minimax(board, depth, isMax, player,alpha ,beta):
     opponent = Player.X if player == Player.O else Player.O
     score = evaluate(board, player, opponent)
-    if score == 10 or score == -10:
-        return score
+    if score == 10 :
+        return score - depth
+    if  score == -10:
+        return score + depth
 
     if isMovesLeft(board) == False:
         return 0
@@ -94,3 +96,38 @@ def findBestMove(board, ai_player):
                     bestMove = (i, j)
                     bestVal = moveVal
     return bestMove
+# def negamax(board, depth, player, alpha, beta):
+#     opponent = Player.X if player == Player.O else Player.O
+#     if TicTacToe.is_winners(board, Player.X):
+#         return 1
+#     if TicTacToe.is_winners(board, Player.O):
+#         return -1
+#     if depth == 0 or TicTacToe.is_cells_occupied(board):
+#         return 0
+
+#     best_value = -float('inf')
+#     for move in TicTacToe.is_cell_empty(board):
+#         board[move[0]][move[1]] = player
+#         value = -negamax(board, depth - 1, opponent, -beta, -alpha)
+#         board[move[0]][move[1]] = None
+
+#         best_value = max(best_value, value)
+#         alpha = max(alpha, value)
+#         if alpha >= beta:
+#             break
+
+#     return best_value
+
+# def find_best_move(board):
+#     best_move = None
+#     best_value = -float('inf')
+#     for move in TicTacToe.is_cell_empty(board):
+#         board[move[0]][move[1]] = Player.X
+#         value = -negamax(board, 9, Player.O, -float('inf'), float('inf'))
+#         board[move[0]][move[1]] = None
+
+#         if value > best_value:
+#             best_value = value
+#             best_move = move
+
+#     return best_move
