@@ -2,16 +2,16 @@ from game_logic import Player
 from typing import List
 from game_logic import TicTacToe
 
+
 def make_decision(board: List[List[Player]], ai_player: Player) -> tuple:
     bestMove = findBestMove(board, ai_player)
-    return (bestMove[0], bestMove[1])
+    return bestMove
+
 
 def isMovesLeft(board):
-    for i in range(3):
-        for j in range(3):
-            if board[i][j] == None:
-                return True
-    return False
+    if all(board[row][col] is not None for row in range(3) for col in range(3)):
+        return False
+    return True
 
 def evaluate(board, player, opponent):
     for row in range(3):
@@ -41,37 +41,35 @@ def evaluate(board, player, opponent):
             return -10
     return 0
 
+
 def minimax(board, depth, isMax, player):
     opponent = Player.X if player == Player.O else Player.O
     score = evaluate(board, player, opponent)
-    if score == 10:
-        return score
-
-    if score == -10:
+    if score == 10 or score == -10:
         return score
 
     if isMovesLeft(board) == False:
         return 0
-    
+
     if isMax:
         best = -1000
         for i in range(3):
             for j in range(3):
                 if board[i][j] == None:
                     board[i][j] = player
-                    best = max(best, minimax(board, depth + 1,not isMax, player))
+                    best = max(best, minimax(board, depth + 1, False, player))
                     board[i][j] = None
         return best
     else:
         best = 1000
-
         for i in range(3):
             for j in range(3):
                 if board[i][j] == None:
                     board[i][j] = opponent
-                    best = min(best, minimax(board, depth + 1, not isMax, player))
+                    best = min(best, minimax(board, depth + 1, True , player))
                     board[i][j] = None
         return best
+
 
 def findBestMove(board, ai_player):
     bestVal = -1000
