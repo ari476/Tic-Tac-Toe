@@ -4,6 +4,7 @@ from ai_player import make_decision
 import numpy as np
 import copy
 import random
+import json
 
 size_of_board = 600
 symbol_size = (size_of_board / 3 - size_of_board / 8) / 2
@@ -11,6 +12,24 @@ symbol_thickness = 30
 symbol_X_color = '#EE4035'
 symbol_O_color = '#0492CF'
 Green_color = '#7BC043'
+AI_PLAYER = Player.O
+
+
+def save_game_result(winner):
+    try:
+        with open('statistics.json', 'r') as file:
+            game_results = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        game_results = {}
+
+    if winner not in game_results:
+        game_results[winner] = 1
+    else:
+        game_results[winner] += 1
+
+    with open('statistics.json', 'w') as file:
+        json.dump(game_results, file)
+
 
 
 class TicTacToeGUI(TicTacToe):
@@ -87,9 +106,12 @@ class TicTacToeGUI(TicTacToe):
             self.make_ai_move()
 
     def make_ai_move(self):
+        global AI_PLAYER
         try:
             cell_pos = make_decision(copy.deepcopy(
                 self.board), self.current_player)
+            AI_PLAYER = self.current_player
+            print(cell_pos)
         except Exception as e:
             self.exit_game('AI Error!', f'AI Error! {e}')
 
@@ -116,6 +138,14 @@ class TicTacToeGUI(TicTacToe):
                 if result_game := self.is_game_over():
                     self.reset_board = True
                     self.display_game_over(result_game)
+
+                    if result_game == AI_PLAYER:
+                        save_game_result("Computer")
+                    elif result_game == 'Tie':
+                        save_game_result("Tie")
+                    else: 
+                        save_game_result('Human')
+
                     return False
 
                 self.current_player = Player.X if self.current_player is Player.O else Player.O
@@ -130,8 +160,29 @@ class TicTacToeGUI(TicTacToe):
         messagebox.showinfo(title, body_text)
         self.window.destroy()
 
+    
+    def simulate_single_game(self):
+        while True:
+            empty_cells = [(row, col) for row in range(3) for col in range(3) if self.is_cell_empty((row, col))]
+            if not empty_cells:
+                return "Tie"
 
-def check_legal_value(cell_pos):
+            if self.current_player == Player.X:
+                cell_pos = random.choice(empty_cells)
+                self.make_move(cell_pos)  
+            else:
+                cell_pos = make_decision(copy.deepcopy(self.board), self.current_player)
+                if not self.is_cell_empty(cell_pos):
+                    raise Exception("AI made an invalid move")  
+
+                self.make_move(cell_pos)
+
+            result = self.is_game_over()
+            if result:
+                return "Player X" if result == Player.X else "AI"
+
+
+def     check_legal_value(cell_pos):
     return isinstance(cell_pos, (list, tuple)) and len(cell_pos) == 2 and all(
         isinstance(elem, int) for elem in cell_pos)
 
@@ -139,3 +190,9 @@ def check_legal_value(cell_pos):
 if __name__ == "__main__":
     game_instance = TicTacToeGUI()
     game_instance.mainloop()
+
+# if __name__ == "__main__":
+#     num_simulations = 1000
+#     from simulation import simulate_games
+#     simulate_games(num_simulations)
+    
