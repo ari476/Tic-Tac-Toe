@@ -1,60 +1,75 @@
+
 from game_logic import Player
-from typing import List ,Optional, Tuple
+from typing import List
 from game_logic import TicTacToe
 
-
 def make_decision(board: List[List[Player]], ai_player: Player) -> tuple:
+    def is_winner(board, player):
+        # Check rows, columns, and diagonals for a win
+        for i in range(3):
+            if all(board[i][j] == player for j in range(3)) or all(board[j][i] == player for j in range(3)):
+                return True
+        if all(board[i][i] == player for i in range(3)) or all(board[i][2 - i] == player for i in range(3)):
+            return True
+        return False
+
+    def is_draw(board):
+    # The game is a draw if there are no empty cells
+     return all(all(cell is not None for cell in row) for row in board)
+
+    def available_moves(board):
+        # Return a list of available (empty) positions on the board
+        moves = []
+        for row in range(3):
+            for col in range(3):
+                if board[row][col] is None:
+                    moves.append((row, col))
+        return moves
+
+    def minimax(board, depth, is_maximizing, player):
+        if is_winner(board, ai_player):
+            return 1
+        if is_winner(board, opponent):
+            return -1
+        if is_draw(board):
+            return 0
+
+        if is_maximizing:
+            best_score = -float('inf')
+            for move in available_moves(board):
+                board[move[0]][move[1]] = ai_player
+                if is_winner(board, ai_player):
+                    score = 1
+                else:
+                    score = minimax(board, depth + 1, False, player)
+                board[move[0]][move[1]] = None
+                best_score = max(score, best_score)
+            return best_score
+        else:
+            best_score = float('inf')
+            for move in available_moves(board):
+                board[move[0]][move[1]] = opponent
+                if is_winner(board, opponent):
+                    score = -1
+                else:
+                    score = minimax(board, depth + 1, True, player)
+                board[move[0]][move[1]] = None
+                best_score = min(score, best_score)
+            return best_score
 
     opponent = Player.X if ai_player == Player.O else Player.O
+    best_move = None
+    best_score = -float('inf')
 
-    if all(all(cell is None for cell in row) for row in board):
-        if board[1][1] is None:
-            return (1, 1)
-        else:
-            # If the center is taken, choose a corner
-            return (0, 0)
+    for move in available_moves(board):
+        board[move[0]][move[1]] = ai_player
+        if is_winner(board, ai_player):
+            return move  # Win if possible
+        score = minimax(board, 0, False, ai_player)
+        board[move[0]][move[1]] = None
 
-    # Check rows for the opponent's potential win and block it
-    for row in board:
-        if row.count(opponent) == 2 and row.count(None) == 1:
-            col = row.index(None)
-            return (board.index(row), col)
+        if score > best_score:
+            best_score = score
+            best_move = move
 
-    # Check columns for the opponent's potential win and block it
-    for col in range(len(board[0])):
-        column = [board[row][col] for row in range(len(board))]
-        if column.count(opponent) == 2 and column.count(None) == 1:
-            row = column.index(None)
-            return (row, col)
-
-    # Check main diagonal for the opponent's potential win and block it
-    main_diag = [board[i][i] for i in range(3)]
-    if main_diag.count(opponent) == 2 and main_diag.count(None) == 1:
-        index = main_diag.index(None)
-        return (index, index)
-
-    # Check the other diagonal for the opponent's potential win and block it
-    other_diag = [board[i][2 - i] for i in range(3)]
-    if other_diag.count(opponent) == 2 and other_diag.count(None) == 1:
-        index = other_diag.index(None)
-        return (index, 2 - index)
-
-    # If there are no immediate threats, proceed with a default strategy
-
-    if board[1][1] is None:
-        return (1, 1)
-
-    # If no immediate threats and the center is taken, choose a corner
-    corners = [(0, 0), (0, 2), (2, 0), (2, 2)]
-    for corner in corners:
-        if board[corner[0]][corner[1]] is None:
-            return corner
-
-    # Choose any available edge
-    edges = [(0, 1), (1, 0), (1, 2), (2, 1)]
-    for edge in edges:
-        if board[edge[0]][edge[1]] is None:
-            return edge
-
-    # Fallback if the board is full (the game should already be over by this point)
-    return (-1, -1)
+    return best_move
