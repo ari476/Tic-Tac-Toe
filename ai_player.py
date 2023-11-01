@@ -32,26 +32,23 @@ def make_decision(board: List[List[Player]], ai_player: Player) -> tuple:
     global IS_FIRST_TURN
 
     # i've defined if the corner is occupied, and the place of the corners 
-    list_corners = [[False, (0,2)], [False, (0,0)], [False, (2,2)], [False, (2,0)]]
+    list_corners = [(0,2), (0,0), (2,2), (2,0)]
 
     if IS_FIRST_TURN == True:  # if its the first turn 
         IS_FIRST_TURN = False
-
         if ai_player == Player.X: # if the ai starts
             rnd_list = [(2,0), (0,0), (2,0), (2,2)]
             return random.choice(rnd_list) # put the ai in the corners
 
         else :
-            if is_cell_empty(board, (1,1)) == True:
+            if is_cell_empty(board, (1,1)):
                 return (1,1)
             else:
-                for i in range(3):
-                    if is_cell_empty(board, list_corners[i][1]) == True:
-                        list_corners[i][1] = True
+                for i in range(4):
+                    if is_cell_empty(board, list_corners[i]) == False:
+                        list_corners.remove(list_corners[i])
 
-                list_of_options = list(filter(lambda x: x, list_corners[i][0])) # a list of the corners that aren't occupied
-                rand_idx = random.randrange(len(list_of_options)) 
-                return list_of_options[rand_idx][1]
+                return random.choice(list_corners) 
 
     else:
         if ai_player == Player.O:
@@ -63,6 +60,78 @@ def make_decision(board: List[List[Player]], ai_player: Player) -> tuple:
             return (1,1)
         
         else: 
+            if board[0][0] == ai_player and board[0][1] == ai_player and is_cell_empty(board, (0, 2)) == True:
+                return (0, 2)
+            
+            elif board[0][1] == ai_player and board[0][2] == ai_player and is_cell_empty(board, (0, 0)) == True:
+                return (0, 0)
+            
+            elif board[0][2] == ai_player and board[1][2] == ai_player and is_cell_empty(board, (2, 2)) == True:
+                return (2, 2)
+            
+            elif board[1][2] == ai_player and board[2][2] == ai_player and is_cell_empty(board, (0, 2)) == True:
+                return (0, 2)
+            
+            elif board[2][1] == ai_player and board[2][2] == ai_player and is_cell_empty(board, (0, 2)) == True:
+                return (0, 2)
+
+            elif board[2][1] == ai_player and board[2][0] == ai_player and is_cell_empty(board, (2, 2)) == True:
+                return (2, 2)
+            
+            elif board[2][0] == ai_player and board[1][0] == ai_player and is_cell_empty(board, (0, 0)) == True:
+                return (0, 0)
+            
+            elif board[1][0] == ai_player and board[0][0] == ai_player and is_cell_empty(board, (2, 0)) == True:
+                return (2, 0)
+            
+            elif board[0][0] == ai_player and board[2][1] == ai_player and is_cell_empty(board, (2, 0)) == True:
+                return (2, 0)
+            
+            elif board[0][2] == ai_player and board[2][1] == ai_player and is_cell_empty(board, (2, 2)) == True:
+                return (2, 2)
+            
+            # if 2 in a row thru the center
+            
+            elif board[1][1] == ai_player and board[0][1] == ai_player and is_cell_empty(board, (2, 1)) == True:
+                return (2, 1)
+            
+            elif board[1][1] == ai_player and board[1][0] == ai_player and is_cell_empty(board, (1, 2)) == True: 
+                return (1, 2)
+            
+            elif board[1][1] == ai_player and board[1][2] == ai_player and is_cell_empty(board, (1, 0)) == True:
+                return (1, 0)
+            
+            elif board[1][1] == ai_player and board[2][1] == ai_player and is_cell_empty(board, (0, 1)) == True:
+                return (0, 1)
+
+            # if 2 in a row in the corners
+          
+            elif board[2][0] == ai_player and board[2][2] == ai_player and is_cell_empty(board, (2, 1)) == True:
+                return (2, 1)
+
+            elif board[2][0] == ai_player and board[0][0] == ai_player and is_cell_empty(board, (1, 0)) == True:
+                return (1, 0)
+            
+            elif board[0][2] == ai_player and board[0][0] == ai_player and is_cell_empty(board, (0, 1)) == True:
+                return (0, 1)
+            
+            elif board[0][2] == ai_player and board[2][2] == ai_player and is_cell_empty(board, (1, 2)) == True:
+                return (1, 2)
+
+            else: # if 2 in diagonal with the center occupied
+                if board[1][1] == ai_player and board[2][2] == ai_player and is_cell_empty(board, (0, 0)) == True:
+                    return (0, 0)
+                elif board[1][1] == ai_player and board[2][0] == ai_player and is_cell_empty(board, (0, 2)) == True:
+                    return (0, 2)
+                elif board[1][1] == ai_player and board[0][0] == ai_player and is_cell_empty(board, (2, 2)) == True:
+                    return (2, 2)
+                elif board[1][1] == ai_player and board[0][2] == ai_player and is_cell_empty(board, (2, 0)) == True:
+                    return (2, 0)
+                
+                # if 2 in diagonal without the center occupied
+                elif ((board[0][0] == ai_player and board[2][2] == ai_player) or (board[0][2] == ai_player and board[2][0]== ai_player)) and is_cell_empty(board, (1, 1)) == True:
+                    return (1, 1)
+
             #if 2 in a row 
             
             if board[0][0] == enemy and board[0][1] == enemy and is_cell_empty(board, (0, 2)) == True:
@@ -77,8 +146,8 @@ def make_decision(board: List[List[Player]], ai_player: Player) -> tuple:
             elif board[1][2] == enemy and board[2][2] == enemy and is_cell_empty(board, (0, 2)) == True:
                 return (0, 2)
             
-            elif board[2][1] == enemy and board[2][2] == enemy and is_cell_empty(board, (0, 2)) == True:
-                return (0, 2)
+            elif board[2][1] == enemy and board[2][2] == enemy and is_cell_empty(board, (2, 0)) == True:
+                return (2, 0)
 
             elif board[2][1] == enemy and board[2][0] == enemy and is_cell_empty(board, (2, 2)) == True:
                 return (2, 2)
@@ -126,8 +195,8 @@ def make_decision(board: List[List[Player]], ai_player: Player) -> tuple:
             else: # if 2 in diagonal with the center occupied
                 if board[1][1] == enemy and board[2][2] == enemy and is_cell_empty(board, (0, 0)) == True:
                     return (0, 0)
-                elif board[1][1] == enemy and board[2][0] == enemy and is_cell_empty(board, (1, 0)) == True:
-                    return (1, 0)
+                elif board[1][1] == enemy and board[2][0] == enemy and is_cell_empty(board, (0, 2)) == True:
+                    return (0, 2)
                 elif board[1][1] == enemy and board[0][0] == enemy and is_cell_empty(board, (2, 2)) == True:
                     return (2, 2)
                 elif board[1][1] == enemy and board[0][2] == enemy and is_cell_empty(board, (2, 0)) == True:
