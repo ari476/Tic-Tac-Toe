@@ -32,7 +32,7 @@ def make_decision(board: List[List[Player]], ai_player: Player) -> tuple:
             elif board[2][1] == user_player:
                 return (0,1)
             elif board[1][2] == user_player:
-                return (1,0)
+                return (0,1)
             else:
                 return (0, 0)
     if o_counter == 1: #if ai_player and user made both one move
@@ -47,10 +47,10 @@ def make_decision(board: List[List[Player]], ai_player: Player) -> tuple:
             return block_column_cell
         if board[0][0] == user_player or board[2][2] == user_player:
             if board[1][1] == ai_player:
-                return random.choice([(1,0), (2,1)])
+                return random.choice([(0,1), (2,1)])
         if board[0][2] == user_player or board[2][0] == user_player:
             if board[1][1] == ai_player:
-                return random.choice([(0,1), (2,1)])
+                return random.choice([(1,0), (2,1)])
         block_small_diagonal = check_small_diagonal(board, user_player)
         if block_small_diagonal[0] != -1 and not block_small_diagonal in get_positions(board, ai_player):
             return block_small_diagonal
@@ -87,7 +87,7 @@ def make_decision(board: List[List[Player]], ai_player: Player) -> tuple:
             return pos_one_in_row
         pos_one_in_column = one_in_column(board, ai_player)
         if pos_one_in_column[0] != -1 and not pos_one_in_column in get_positions(board, user_player):
-                return pos_one_in_column
+            return pos_one_in_column
     for row in range(3):
         for cell in range(3):
             if board[row][cell] is None:
@@ -167,11 +167,13 @@ def one_in_column(board: List[List[Player]], player) -> tuple:
 def one_in_row(board: List[List[Player]], player) -> tuple:
     for i in range(len(board)):
         if board[0][i] == player and board[1][i] is None and board[2][i] is None:
-            return (i, 2)
+            return (2, i)
         if board[0][i] is None and board[1][i] == player and board[2][i] is None:
-            return (i, 0)
+            return (0, i)
         if board[0][i] is None and board[1][i] is None and board[2][i] == player:
             return (1, i)
+        
+
     return (-1,-1)
 
 def check_small_diagonal(board: List[List[Player]], player) -> tuple:
