@@ -32,7 +32,7 @@ class TicTacToeGUI(TicTacToe):
         super().__init__()
         self.reset_board = False
         is_ai_start = random.choice([True, False])
-        self.make_ai_move() if is_ai_start else None
+        # self.make_ai_move() if is_ai_start else None
 
         for i in range(2):
             self.canvas.create_line(
