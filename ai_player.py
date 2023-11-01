@@ -172,8 +172,6 @@ def one_in_row(board: List[List[Player]], player) -> tuple:
             return (0, i)
         if board[0][i] is None and board[1][i] is None and board[2][i] == player:
             return (1, i)
-        
-
     return (-1,-1)
 
 def check_small_diagonal(board: List[List[Player]], player) -> tuple:
