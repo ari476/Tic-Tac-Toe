@@ -1,7 +1,39 @@
 from game_logic import Player
 from typing import List
-from game_logic import TicTacToe
-import random
+
+def make_decision(board: List[List[Player]], ai_player: Player) -> tuple: #returns best move for ai
+    """
+    Args:
+        board (List[List[Player]]): current state of board in the game
+        ai_player (Player): X or O enum 
+
+    Returns:
+        tuple: cell position for placing the next symbol on the game board
+        (y, x)
+    """  
+    if ai_player == Player.X:
+        player = Player.X
+        opponent = Player.O
+    else:
+        opponent = Player.X
+        player = Player.O
+
+    best_val = -1000 
+    best_move = (-1, -1)  
+
+    for row in range(3) :      
+        for col in range(3) : 
+
+            if (board[row][col] == None) :  
+                board[row][col] = player 
+                move_val = minimax(board, 0, False, player, opponent)  
+                board[row][col] = None
+
+                if (move_val > best_val) :                 
+                    best_move = (row, col) 
+                    best_val = move_val 
+
+    return best_move 
 
 def is_moves_left(board) :  #checks if there are moves left to do
 
@@ -81,37 +113,3 @@ def minimax(board, depth, is_max, player, opponent) :  #minimax function (checks
                     best = min(best, minimax(board, depth + 1, not is_max, player, opponent)) 
                     board[row][col] = None
         return best 
-
-def make_decision(board: List[List[Player]], ai_player: Player) -> tuple: #returns best move for ai
-    """
-    Args:
-        board (List[List[Player]]): current state of board in the game
-        ai_player (Player): X or O enum 
-
-    Returns:
-        tuple: cell position for placing the next symbol on the game board
-        (y, x)
-    """  
-    if ai_player == Player.X:
-        player = Player.X
-        opponent = Player.O
-    else:
-        opponent = Player.X
-        player = Player.O
-
-    best_val = -1000 
-    best_move = (-1, -1)  
-
-    for row in range(3) :      
-        for col in range(3) : 
-
-            if (board[row][col] == None) :  
-                board[row][col] = player 
-                move_val = minimax(board, 0, False, player, opponent)  
-                board[row][col] = None
-
-                if (move_val > best_val) :                 
-                    best_move = (row, col) 
-                    best_val = move_val 
-
-    return best_move 
