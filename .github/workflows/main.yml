@@ -1,0 +1,26 @@
+name: "PR Title Check"
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - reopened
+      - synchronize # Run when new commits are pushed
+
+jobs:
+  check_pr_title:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate PR title
+        uses: amannn/action-semantic-pull-request@v4
+        with:
+          # Configuration for conventional commits (example)
+          # This requires titles like "feat: description" or "fix(scope): description"
+          # You can customize the requireScopes and allowed types
+          requireScopes: false 
+          allowedTypes: '["feat", "fix", "docs", "style", "refactor", "perf", "test", "build", "ci", "chore", "revert"]'
+          # If you need a custom regex, you might use a different action like DylanVann/check-pull-request-title
+          # Example for custom regex (if using the alternative action):
+          # regex: '^(fix|feat|chore): .+'
+          # errorOnMatch: false
