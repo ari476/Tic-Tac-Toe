@@ -12,18 +12,20 @@ jobs:
   check_pr_title:
     runs-on: ubuntu-latest
     steps:
-      - name: Check PR title
-        uses: DylanVann/check-pull-request-title@v1
+      - name: Validate PR title with regex
+        uses: mheap/github-action-required-labels@v3
         with:
-          regex: '^(feat|fix|docs|chore): .+'
-          errorMessage: |
+          title-regex: '^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+\))?: .+'
+          title-regex-flags: 'i'
+          title-regex-fail-message: |
             ❌ Invalid PR title.
 
-            Your PR title must follow:
-            **feat: description**
-            or
-            **fix: description**
+            Your PR title must follow **Conventional Commits**:
+
+            ```
+            <type>(optional_scope): description
+            ```
 
             Examples:
-            - feat: support multi-select
-            - fix: crash when saving form
+            - feat: add new login screen
+            - fix(auth): prevent refresh loop
